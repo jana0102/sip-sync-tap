@@ -29,14 +29,14 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "SipSync — Quiet hydration tracking" },
+      { name: "description", content: "Minimalist hydration app for Android. Tap an NFC sticker or the progress ring to log water instantly. Smart reminders, streaks, native feel." },
+      { name: "author", content: "SipSync" },
+      { property: "og:title", content: "SipSync — Quiet hydration tracking" },
+      { property: "og:description", content: "Tap to log. Tap to live. NFC-powered hydration with smart reminders and streaks." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "theme-color", content: "#5C9CE6" },
     ],
     links: [
       {

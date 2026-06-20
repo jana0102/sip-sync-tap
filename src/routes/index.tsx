@@ -7,6 +7,7 @@ import { ProgressRing } from "@/components/sipsync/ProgressRing";
 import { QuickAddSheet } from "@/components/sipsync/QuickAddSheet";
 import { HistorySheet } from "@/components/sipsync/HistorySheet";
 import { NfcSheet } from "@/components/sipsync/NfcSheet";
+import { SettingsSheet } from "@/components/sipsync/SettingsSheet";
 import { HydrationChart } from "@/components/sipsync/HydrationChart";
 import { Droplet } from "@/components/sipsync/Droplet";
 import {

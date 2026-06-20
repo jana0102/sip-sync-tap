@@ -130,6 +130,18 @@ export function useSipSync() {
     setState(() => defaultState);
   }, []);
 
+  const setPresets = useCallback((presets: number[]) => {
+    setState((s) => ({ ...s, presets }));
+  }, []);
+
+  const setStickers = useCallback((stickers: SipState["stickers"]) => {
+    setState((s) => ({ ...s, stickers }));
+  }, []);
+
+  const clearLogs = useCallback(() => {
+    setState((s) => ({ ...s, logs: [] }));
+  }, []);
+
   return {
     state,
     addLog,
@@ -138,8 +150,12 @@ export function useSipSync() {
     completeOnboarding,
     updateOnboarding,
     resetAll,
+    setPresets,
+    setStickers,
+    clearLogs,
   };
 }
+
 
 // ---- helpers ----
 export function recommendGoalMl(weightKg?: number, sex?: Sex): number {

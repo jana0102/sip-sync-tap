@@ -10,7 +10,8 @@ import { NfcSheet } from "@/components/sipsync/NfcSheet";
 import { HydrationChart } from "@/components/sipsync/HydrationChart";
 import { Droplet } from "@/components/sipsync/Droplet";
 import {
-  computeStreak,
+  computeStreakInfo,
+  forgivenessMessage,
   formatAmount,
   startOfDay,
   toneMessage,

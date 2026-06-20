@@ -43,13 +43,25 @@ export const Route = createFileRoute("/")({
 type Range = "day" | "week" | "month";
 
 function Home() {
-  const { state, addLog, removeLog, completeOnboarding } = useSipSync();
+  const {
+    state,
+    addLog,
+    removeLog,
+    completeOnboarding,
+    updateOnboarding,
+    setPresets,
+    setStickers,
+    clearLogs,
+    resetAll,
+  } = useSipSync();
   const [hydrated, setHydrated] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [nfcOpen, setNfcOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [flash, setFlash] = useState(0);
   const [range, setRange] = useState<Range>("day");
+
 
   useEffect(() => setHydrated(true), []);
 

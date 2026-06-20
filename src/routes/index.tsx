@@ -10,7 +10,8 @@ import { NfcSheet } from "@/components/sipsync/NfcSheet";
 import { HydrationChart } from "@/components/sipsync/HydrationChart";
 import { Droplet } from "@/components/sipsync/Droplet";
 import {
-  computeStreak,
+  computeStreakInfo,
+  forgivenessMessage,
   formatAmount,
   startOfDay,
   toneMessage,
@@ -53,10 +54,12 @@ function Home() {
 
   const today = startOfDay(Date.now());
   const todayMl = useMemo(() => totalForDay(state.logs, today), [state.logs, today]);
-  const streak = useMemo(
-    () => computeStreak(state.logs, state.onboarding.goalMl),
+  const streakInfo = useMemo(
+    () => computeStreakInfo(state.logs, state.onboarding.goalMl),
     [state.logs, state.onboarding.goalMl],
   );
+  const streak = streakInfo.streak;
+  const forgiveNote = forgivenessMessage(streakInfo.forgiveness);
   const percent = Math.min(100, Math.round((todayMl / state.onboarding.goalMl) * 100));
 
   const handleAdd = (ml: number, source = "Manual") => {
@@ -150,14 +153,18 @@ function Home() {
         </div>
 
         {/* Streak */}
-        <div className="relative z-10 flex justify-center mb-6">
+        <div className="relative z-10 flex flex-col items-center gap-2 mb-6">
           <div className="flex items-center gap-2.5 px-5 py-2.5 bg-surface rounded-full ring-1 ring-water-soft/60 shadow-soft">
             <span className="size-1.5 rounded-full bg-water animate-pulse" />
             <span className="text-xs font-bold tracking-[0.18em] uppercase text-foreground tabular">
               {streak === 0 ? "Start your rhythm" : `${streak} day rhythm`}
             </span>
           </div>
+          {forgiveNote && (
+            <p className="text-[11px] italic text-muted-foreground">{forgiveNote}</p>
+          )}
         </div>
+
 
         {/* Stats card */}
         <div className="relative z-10 rounded-3xl bg-surface ring-1 ring-border/60 p-5 shadow-soft">

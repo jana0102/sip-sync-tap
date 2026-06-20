@@ -255,6 +255,19 @@ function Home() {
         onTap={(s) => handleAdd(s.amountMl, s.name)}
       />
 
+      <SettingsSheet
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        onboarding={state.onboarding}
+        presets={state.presets}
+        stickers={state.stickers}
+        onUpdateOnboarding={updateOnboarding}
+        onSetPresets={setPresets}
+        onSetStickers={setStickers}
+        onClearLogs={clearLogs}
+        onResetAll={resetAll}
+      />
+
       <Toaster position="top-center" />
     </div>
   );

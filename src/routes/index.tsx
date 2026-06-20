@@ -54,10 +54,12 @@ function Home() {
 
   const today = startOfDay(Date.now());
   const todayMl = useMemo(() => totalForDay(state.logs, today), [state.logs, today]);
-  const streak = useMemo(
-    () => computeStreak(state.logs, state.onboarding.goalMl),
+  const streakInfo = useMemo(
+    () => computeStreakInfo(state.logs, state.onboarding.goalMl),
     [state.logs, state.onboarding.goalMl],
   );
+  const streak = streakInfo.streak;
+  const forgiveNote = forgivenessMessage(streakInfo.forgiveness);
   const percent = Math.min(100, Math.round((todayMl / state.onboarding.goalMl) * 100));
 
   const handleAdd = (ml: number, source = "Manual") => {

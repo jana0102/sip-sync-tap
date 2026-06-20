@@ -163,26 +163,91 @@ export function totalForDay(logs: LogEntry[], dayStart: number): number {
     .reduce((sum, l) => sum + l.amountMl, 0);
 }
 
-export function computeStreak(logs: LogEntry[], goalMl: number): number {
-  if (logs.length === 0) return 0;
+export interface StreakInfo {
+  streak: number;
+  /** "grace" = yesterday missed but it's before 10am today and user has logged today.
+   *  "saved" = a longer past gap was adaptively forgiven.
+   *  null = normal streak (no special note). */
+  forgiveness: "grace" | "saved" | null;
+}
+
+/** Deterministic hash → [0,1) so the "save" chance is stable per (day, streak). */
+function hash01(seed: string): number {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0) / 0xffffffff;
+}
+
+export function computeStreakInfo(logs: LogEntry[], goalMl: number): StreakInfo {
+  if (logs.length === 0) return { streak: 0, forgiveness: null };
+  const DAY = 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const today = startOfDay(now);
+  const hour = new Date(now).getHours();
+
   let streak = 0;
-  let day = startOfDay(Date.now());
-  // Allow today to count even if not yet met — we count completed days going back.
-  // Skip today if not yet met but check if user is on track.
-  if (totalForDay(logs, day) >= goalMl) streak++;
-  day -= 24 * 60 * 60 * 1000;
+  let forgiveness: StreakInfo["forgiveness"] = null;
+  let cursor = today;
+
+  // Today
+  const todayTotal = totalForDay(logs, today);
+  const todayMet = todayTotal >= goalMl;
+  if (todayMet) {
+    streak++;
+    cursor -= DAY;
+  } else if (hour < 10 && todayTotal > 0) {
+    // Before 10am grace: if yesterday was missed but user already sipped today,
+    // treat yesterday's miss as forgiven and keep counting from the day before.
+    const yest = today - DAY;
+    if (totalForDay(logs, yest) < goalMl) {
+      forgiveness = "grace";
+      cursor = yest - DAY; // skip yesterday, keep walking
+    } else {
+      cursor = yest;
+    }
+  } else {
+    // Today not met and no grace — streak walks from yesterday.
+    cursor -= DAY;
+  }
+
   while (true) {
-    const total = totalForDay(logs, day);
+    const total = totalForDay(logs, cursor);
     if (total >= goalMl) {
       streak++;
-      day -= 24 * 60 * 60 * 1000;
-    } else {
-      // grace: if today isn't met yet but we logged before 10am next day — let it slide once
-      break;
+      cursor -= DAY;
+      continue;
     }
+    // Adaptive save: rarer as the streak grows. Only one save allowed.
+    if (forgiveness === null && streak >= 3) {
+      // 50% at streak 3, decaying toward 0 around streak 30.
+      const chance = Math.max(0, 0.5 - streak * 0.017);
+      const roll = hash01(`${today}:${streak}`);
+      if (roll < chance) {
+        forgiveness = "saved";
+        cursor -= DAY;
+        continue;
+      }
+    }
+    break;
   }
-  return streak;
+
+  return { streak, forgiveness };
 }
+
+/** Back-compat wrapper. */
+export function computeStreak(logs: LogEntry[], goalMl: number): number {
+  return computeStreakInfo(logs, goalMl).streak;
+}
+
+export function forgivenessMessage(f: StreakInfo["forgiveness"]): string | null {
+  if (f === "grace") return "We'll let that one slide.";
+  if (f === "saved") return "Streak saved. Don't make it a habit.";
+  return null;
+}
+
 
 export function formatAmount(ml: number, unit: Unit): string {
   if (unit === "oz") {

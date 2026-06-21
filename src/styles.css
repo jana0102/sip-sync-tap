@@ -81,19 +81,23 @@
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 1.25rem;
 
-  /* Frosted Minimalist palette */
-  --background: oklch(0.974 0.005 240);          /* #F2F5F8 glass-bg */
-  --foreground: oklch(0.27 0.04 256);            /* #1E293B ink */
-  --surface: oklch(1 0 0);                       /* white */
-  --glass: oklch(0.974 0.005 240);
-  --ink: oklch(0.27 0.04 256);
-  --ink-soft: oklch(0.68 0.03 256);              /* #94A3B8 muted */
+  /* Premium minimalist palette — warm paper, deep slate ink, twilight water */
+  --background: oklch(0.985 0.003 240);          /* near-paper white with a cool whisper */
+  --foreground: oklch(0.22 0.025 250);           /* deep slate-ink */
+  --surface: oklch(1 0 0);                       /* pure white card */
+  --surface-elevated: oklch(0.995 0.002 240);    /* barely tinted elevated */
+  --glass: oklch(0.985 0.003 240);
+  --ink: oklch(0.22 0.025 250);
+  --ink-soft: oklch(0.58 0.022 250);             /* sophisticated muted */
 
-  --water: oklch(0.69 0.12 240);                 /* #5C9CE6 SipSync blue */
-  --water-deep: oklch(0.55 0.16 245);
-  --water-soft: oklch(0.96 0.02 240);            /* #EEF4FA */
+  --water: oklch(0.62 0.13 242);                 /* deeper twilight blue */
+  --water-deep: oklch(0.45 0.16 248);            /* midnight accent */
+  --water-soft: oklch(0.965 0.018 240);
+  --water-mist: oklch(0.93 0.025 238);
+
+  --hairline: oklch(0.92 0.008 245);
 
   --card: var(--surface);
   --card-foreground: var(--ink);
@@ -107,10 +111,10 @@
   --muted-foreground: var(--ink-soft);
   --accent: var(--water-soft);
   --accent-foreground: var(--water-deep);
-  --destructive: oklch(0.62 0.22 27);
+  --destructive: oklch(0.58 0.18 27);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.93 0.012 240);
-  --input: oklch(0.93 0.012 240);
+  --border: var(--hairline);
+  --input: var(--hairline);
   --ring: var(--water);
 
   --chart-1: var(--water);

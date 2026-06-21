@@ -113,7 +113,7 @@ function Home() {
   const tone = toneMessage(percent, streak);
 
   return (
-    <div className="min-h-dvh bg-background flex flex-col items-center">
+    <div className="min-h-dvh bg-background flex flex-col items-center relative overflow-hidden">
       {/* Edge flash overlay */}
       <div
         key={flash}
@@ -121,51 +121,77 @@ function Home() {
         aria-hidden
       />
 
-      <main className="w-full max-w-md flex-1 flex flex-col px-6 pt-8 pb-6 relative">
-        {/* Ambient halo */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[420px] h-[420px] bg-water/10 rounded-full blur-[100px] pointer-events-none" />
+      {/* Ambient atmosphere */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[640px] h-[640px] rounded-full"
+        style={{
+          background:
+            "radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--color-water) 14%, transparent), transparent 70%)",
+          filter: "blur(60px)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-[-20%] left-[-10%] w-[420px] h-[420px] rounded-full opacity-60"
+        style={{
+          background:
+            "radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--color-water-deep) 8%, transparent), transparent 70%)",
+          filter: "blur(80px)",
+        }}
+      />
 
+      <main className="w-full max-w-md flex-1 flex flex-col px-6 pt-6 pb-8 relative z-10">
         {/* Top bar */}
-        <header className="relative z-10 flex items-center justify-between">
+        <header className="flex items-center justify-between mb-2">
           <button
             onClick={() => setHistoryOpen(true)}
-            className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+            className="size-9 rounded-full bg-surface/70 backdrop-blur hairline flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="History"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <polyline points="12 7 12 12 15.5 13.5" />
             </svg>
-            History
           </button>
-          <div className="flex items-center gap-2">
-            <Droplet size={12} />
-            <span className="text-xs font-bold tracking-[0.25em] uppercase text-foreground">SipSync</span>
+
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="text-[10px] font-medium tracking-[0.42em] uppercase text-muted-foreground">
+              SipSync
+            </span>
+            <span className="font-display text-[13px] italic text-foreground/70 leading-none">
+              No.{String(streak).padStart(2, "0")}
+            </span>
           </div>
-          <div className="flex items-center gap-4">
+
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setNfcOpen(true)}
-              className="flex items-center gap-1.5 text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+              className="size-9 rounded-full bg-surface/70 backdrop-blur hairline flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors relative"
               aria-label="Simulate NFC tap"
             >
-              NFC
-              <span className="size-1.5 rounded-full bg-water animate-pulse" />
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12a7 7 0 0 1 14 0" />
+                <path d="M8 12a4 4 0 0 1 8 0" />
+                <circle cx="12" cy="12" r="1" />
+              </svg>
+              <span className="absolute top-1.5 right-1.5 size-1 rounded-full bg-water animate-pulse" />
             </button>
             <button
               onClick={() => setSettingsOpen(true)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="size-9 rounded-full bg-surface/70 backdrop-blur hairline flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Open settings"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="2.5" />
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
             </button>
           </div>
-
         </header>
 
         {/* Progress ring */}
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
+        <div className="flex-1 flex flex-col items-center justify-center">
           <ProgressRing
             currentMl={todayMl}
             goalMl={state.onboarding.goalMl}
@@ -173,33 +199,35 @@ function Home() {
             onTap={() => setQuickOpen(true)}
             pulseKey={flash}
           />
-          <p className="mt-6 text-sm text-muted-foreground text-center text-balance max-w-xs">
+          <p className="mt-8 font-display italic text-[17px] text-foreground/75 text-center text-balance max-w-[18rem] leading-snug">
             {tone}
           </p>
         </div>
 
         {/* Streak */}
-        <div className="relative z-10 flex flex-col items-center gap-2 mb-6">
-          <div className="flex items-center gap-2.5 px-5 py-2.5 bg-surface rounded-full ring-1 ring-water-soft/60 shadow-soft">
-            <span className="size-1.5 rounded-full bg-water animate-pulse" />
-            <span className="text-xs font-bold tracking-[0.18em] uppercase text-foreground tabular">
-              {streak === 0 ? "Start your rhythm" : `${streak} day rhythm`}
+        <div className="flex flex-col items-center gap-2 mb-6 mt-4">
+          <div className="flex items-center gap-3 px-4 py-2 bg-surface/80 backdrop-blur rounded-full hairline">
+            <span className="relative flex size-1.5">
+              <span className="absolute inset-0 rounded-full bg-water animate-ping opacity-50" />
+              <span className="relative inline-flex rounded-full size-1.5 bg-water" />
+            </span>
+            <span className="text-[10px] font-semibold tracking-[0.22em] uppercase text-foreground/80 tabular">
+              {streak === 0 ? "Begin your rhythm" : `${streak} day rhythm`}
             </span>
           </div>
           {forgiveNote && (
-            <p className="text-[11px] italic text-muted-foreground">{forgiveNote}</p>
+            <p className="text-[11px] italic text-muted-foreground font-display">{forgiveNote}</p>
           )}
         </div>
 
-
         {/* Stats card */}
-        <div className="relative z-10 rounded-3xl bg-surface ring-1 ring-border/60 p-5 shadow-soft">
-          <div className="flex items-center justify-between mb-4">
+        <div className="rounded-[28px] bg-surface hairline p-5 shadow-soft">
+          <div className="flex items-end justify-between mb-5">
             <div>
-              <div className="text-xs font-bold tracking-widest uppercase text-muted-foreground">
+              <div className="text-[10px] font-medium tracking-[0.28em] uppercase text-muted-foreground">
                 {range === "day" ? "Today" : range === "week" ? "This week" : "This month"}
               </div>
-              <div className="text-lg font-semibold text-foreground tabular mt-0.5">
+              <div className="font-display text-3xl font-light text-foreground tabular mt-1.5 tracking-tight">
                 {formatAmount(
                   range === "day"
                     ? todayMl
@@ -216,12 +244,12 @@ function Home() {
                 )}
               </div>
             </div>
-            <div className="bg-muted p-1 rounded-xl flex">
+            <div className="bg-water-soft/60 p-0.5 rounded-full flex hairline">
               {(["day", "week", "month"] as Range[]).map((r) => (
                 <button
                   key={r}
                   onClick={() => setRange(r)}
-                  className={`px-3 py-1.5 text-xs font-bold tracking-wider uppercase rounded-lg transition-all ${range === r ? "bg-surface text-foreground shadow-soft" : "text-muted-foreground"}`}
+                  className={`px-3 py-1 text-[10px] font-semibold tracking-[0.18em] uppercase rounded-full transition-all ${range === r ? "bg-surface text-foreground shadow-soft" : "text-muted-foreground"}`}
                 >
                   {r}
                 </button>

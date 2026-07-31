@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Droplet } from "@/components/sipsync/Droplet";
+import { connectHealth, getHealthProvider } from "@/lib/health";
 import { recommendGoalMl, type Sex, type Unit, type OnboardingData } from "@/lib/sipsync-store";
+
 
 interface OnboardingProps {
   onComplete: (data: Partial<OnboardingData>) => void;

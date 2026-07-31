@@ -17,6 +17,10 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState<Step>(0);
   const [unit, setUnit] = useState<Unit>("ml");
   const [healthConnected, setHealthConnected] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [healthError, setHealthError] = useState<string | null>(null);
+  const provider = useMemo(() => getHealthProvider(), []);
+
   const [sex, setSex] = useState<Sex>("male");
   const [weight, setWeight] = useState<string>("75");
   const [height, setHeight] = useState<string>("175");

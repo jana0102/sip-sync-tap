@@ -95,41 +95,55 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                   ? "Pull weight and activity from Health Connect to keep your goal accurate."
                   : "On iPhone we use Apple Health, on Android we use Health Connect, to keep your goal accurate."}
             </p>
-            <div className="mt-10 flex flex-col gap-3">
-              <button
-                disabled={connecting}
-                onClick={async () => {
-                  setConnecting(true);
-                  setHealthError(null);
-                  const res = await connectHealth();
-                  setConnecting(false);
-                  if (res.connected) {
-                    setHealthConnected(true);
-                    if (res.weightKg) setWeight(String(Math.round(res.weightKg)));
-                    if (res.heightCm) setHeight(String(Math.round(res.heightCm)));
-                    next();
-                  } else {
-                    setHealthConnected(false);
-                    setHealthError(res.reason ?? "Couldn't connect.");
-                  }
-                }}
-                className="rounded-2xl bg-water-soft/60 ring-1 ring-water-soft p-5 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
-              >
-                <div className="font-semibold text-foreground">
-                  {connecting ? "Connecting…" : `Connect ${provider.name}`}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">Recommended — keeps your goal current.</div>
-              </button>
-              <button
+
+            {!provider.native && (
+              <p className="mt-4 rounded-2xl bg-muted/60 p-4 text-sm text-muted-foreground text-balance">
+                {provider.platform === "web"
+                  ? "Health syncing needs the SipSync app. In this browser, enter your details manually — it only takes a moment."
+                  : `${provider.name} can only be reached from the SipSync app. Continue manually here — everything else works the same.`}
+              </p>
+            )}
+
+            <div className="mt-8 flex flex-col gap-3">
+              {provider.native && (
+                <button
+                  disabled={connecting}
+                  onClick={async () => {
+                    setConnecting(true);
+                    setHealthError(null);
+                    const res = await connectHealth();
+                    setConnecting(false);
+                    if (res.connected) {
+                      setHealthConnected(true);
+                      if (res.weightKg) setWeight(String(Math.round(res.weightKg)));
+                      if (res.heightCm) setHeight(String(Math.round(res.heightCm)));
+                      next();
+                    } else {
+                      setHealthConnected(false);
+                      setHealthError(res.reason ?? "Couldn't connect.");
+                    }
+                  }}
+                  className="rounded-2xl bg-water-soft/60 ring-1 ring-water-soft p-5 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
+                >
+                  <div className="font-semibold text-foreground">
+                    {connecting ? "Connecting…" : `Connect ${provider.name}`}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">Recommended — keeps your goal current.</div>
+                </button>
+              )}
+
+              <Button
                 onClick={next}
-                className="rounded-2xl bg-surface ring-1 ring-border p-5 text-left transition-all hover:bg-muted/50"
+                className="h-14 rounded-2xl bg-water hover:bg-water-deep text-white text-base font-semibold shadow-soft"
               >
-                <div className="font-semibold text-foreground">
-                  {healthError ? "Continue manually" : "Skip for now"}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">You can connect later in Settings.</div>
-              </button>
+                {provider.native ? "Skip for now" : "Enter details manually"}
+              </Button>
+
+              {provider.native && (
+                <p className="text-center text-sm text-muted-foreground">You can connect later in Settings.</p>
+              )}
             </div>
+
             {healthError && (
               <p className="mt-4 text-sm text-muted-foreground text-balance">{healthError}</p>
             )}

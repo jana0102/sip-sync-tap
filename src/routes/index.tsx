@@ -33,7 +33,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Tap to log. Tap to live. NFC-powered hydration tracking with smart reminders and streaks.",
+          "SipSync is a minimalist hydration app: tap an NFC sticker or the progress ring to log water instantly. Streaks, smart reminders, and a calm, native feel.",
       },
     ],
   }),

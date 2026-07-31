@@ -170,7 +170,22 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
   }
+
+  /* App-like feel: no accidental text selection anywhere... */
+  * {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* ...except where the user is actually meant to type or copy. */
+  input, textarea, select, [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
 }
 
 @layer utilities {

@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Droplet } from "@/components/sipsync/Droplet";
+import { connectHealth, getHealthProvider } from "@/lib/health";
 import { recommendGoalMl, type Sex, type Unit, type OnboardingData } from "@/lib/sipsync-store";
+
 
 interface OnboardingProps {
   onComplete: (data: Partial<OnboardingData>) => void;
@@ -15,6 +17,10 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState<Step>(0);
   const [unit, setUnit] = useState<Unit>("ml");
   const [healthConnected, setHealthConnected] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [healthError, setHealthError] = useState<string | null>(null);
+  const provider = useMemo(() => getHealthProvider(), []);
+
   const [sex, setSex] = useState<Sex>("male");
   const [weight, setWeight] = useState<string>("75");
   const [height, setHeight] = useState<string>("175");
@@ -80,32 +86,56 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         {step === 1 && (
           <div className="w-full animate-[fade-in_0.4s_ease-out]">
             <h2 className="text-3xl font-light tracking-tight text-foreground text-balance">
-              Connect your health data
+              Connect {provider.name}
             </h2>
             <p className="mt-3 text-base text-muted-foreground">
-              Pull weight and activity from Health Connect to keep your goal accurate.
+              {provider.platform === "ios"
+                ? "Pull weight and activity from Apple Health to keep your goal accurate."
+                : provider.platform === "android"
+                  ? "Pull weight and activity from Health Connect to keep your goal accurate."
+                  : "On iPhone we use Apple Health, on Android we use Health Connect, to keep your goal accurate."}
             </p>
             <div className="mt-10 flex flex-col gap-3">
               <button
-                onClick={() => {
-                  setHealthConnected(true);
-                  next();
+                disabled={connecting}
+                onClick={async () => {
+                  setConnecting(true);
+                  setHealthError(null);
+                  const res = await connectHealth();
+                  setConnecting(false);
+                  if (res.connected) {
+                    setHealthConnected(true);
+                    if (res.weightKg) setWeight(String(Math.round(res.weightKg)));
+                    if (res.heightCm) setHeight(String(Math.round(res.heightCm)));
+                    next();
+                  } else {
+                    setHealthConnected(false);
+                    setHealthError(res.reason ?? "Couldn't connect.");
+                  }
                 }}
-                className="rounded-2xl bg-water-soft/60 ring-1 ring-water-soft p-5 text-left transition-all hover:-translate-y-0.5"
+                className="rounded-2xl bg-water-soft/60 ring-1 ring-water-soft p-5 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
               >
-                <div className="font-semibold text-foreground">Connect Health Connect</div>
+                <div className="font-semibold text-foreground">
+                  {connecting ? "Connecting…" : `Connect ${provider.name}`}
+                </div>
                 <div className="text-sm text-muted-foreground mt-1">Recommended — keeps your goal current.</div>
               </button>
               <button
                 onClick={next}
                 className="rounded-2xl bg-surface ring-1 ring-border p-5 text-left transition-all hover:bg-muted/50"
               >
-                <div className="font-semibold text-foreground">Skip for now</div>
+                <div className="font-semibold text-foreground">
+                  {healthError ? "Continue manually" : "Skip for now"}
+                </div>
                 <div className="text-sm text-muted-foreground mt-1">You can connect later in Settings.</div>
               </button>
             </div>
+            {healthError && (
+              <p className="mt-4 text-sm text-muted-foreground text-balance">{healthError}</p>
+            )}
           </div>
         )}
+
 
         {step === 2 && (
           <div className="w-full animate-[fade-in_0.4s_ease-out]">

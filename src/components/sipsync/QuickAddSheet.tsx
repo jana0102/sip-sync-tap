@@ -42,23 +42,23 @@ export function QuickAddSheet({ open, onOpenChange, presets, unit, onAdd }: Quic
 
         <div className="mt-6 grid grid-cols-3 gap-3">
           {presets.map((ml) => (
-            <button
+            <Button variant="ghost"
               key={ml}
               onClick={() => submit(ml)}
-              className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-water-soft/60 p-5 ring-1 ring-water-soft transition-all hover:bg-water-soft hover:-translate-y-0.5 active:scale-95"
+              className="h-auto flex flex-col items-center justify-center gap-2 rounded-lg bg-water-soft/60 p-5 ring-1 ring-water-soft transition-all hover:bg-water-soft hover:-translate-y-0.5 active:scale-95"
             >
               <Droplet size={20} />
               <span className="text-base font-semibold text-foreground tabular">
                 {formatAmount(ml, unit)}
               </span>
-            </button>
+            </Button>
           ))}
         </div>
 
         <div className="mt-6 flex items-center gap-2">
           <div className="flex-1 relative">
             <Input
-              inputMode="numeric"
+              aria-label="Custom water amount" inputMode="numeric"
               value={custom}
               onChange={(e) => setCustom(e.target.value.replace(/[^\d]/g, ""))}
               placeholder="Custom"
@@ -72,7 +72,7 @@ export function QuickAddSheet({ open, onOpenChange, presets, unit, onAdd }: Quic
           <Button
             onClick={handleCustom}
             disabled={!custom}
-            className="h-14 rounded-2xl px-6 bg-water hover:bg-water-deep text-white font-semibold shadow-soft"
+            className="h-14 rounded-2xl px-6 bg-water hover:bg-water-deep text-primary-foreground font-semibold shadow-soft"
           >
             Add
           </Button>

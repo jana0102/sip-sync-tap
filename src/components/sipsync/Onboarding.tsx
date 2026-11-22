@@ -56,7 +56,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   return (
-    <div className="min-h-dvh bg-background flex flex-col">
+    <div className="onboarding-canvas min-h-dvh bg-background flex flex-col">
       {/* progress dots */}
       <div className="flex items-center justify-center gap-1.5 pt-12">
         {[0, 1, 2, 3, 4].map((i) => (
@@ -71,12 +71,12 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         {step === 0 && (
           <div className="w-full text-center animate-[fade-in_0.4s_ease-out]">
             <Droplet size={56} pulse className="mx-auto mb-8" />
-            <h1 className="text-4xl font-light tracking-tight text-foreground">SipSync</h1>
+            <h1 className="text-4xl font-light tracking-normal text-foreground">SipSync</h1>
             <p className="mt-3 text-base text-muted-foreground text-balance">
               Quiet hydration tracking. Tap to log, sync to live.
             </p>
             <div className="mt-12 flex flex-col gap-3">
-              <Button onClick={next} className="h-14 rounded-2xl bg-water hover:bg-water-deep text-white text-base font-semibold shadow-soft">
+              <Button onClick={next} className="h-14 rounded-2xl bg-water hover:bg-water-deep text-primary-foreground text-base font-semibold shadow-soft">
                 Get started
               </Button>
             </div>
@@ -85,7 +85,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
         {step === 1 && (
           <div className="w-full animate-[fade-in_0.4s_ease-out]">
-            <h2 className="text-3xl font-light tracking-tight text-foreground text-balance">
+            <h2 className="text-3xl font-light tracking-normal text-foreground text-balance">
               Connect {provider.name}
             </h2>
             <p className="mt-3 text-base text-muted-foreground">
@@ -134,7 +134,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
               <Button
                 onClick={next}
-                className="h-14 rounded-2xl bg-water hover:bg-water-deep text-white text-base font-semibold shadow-soft"
+                className="h-14 rounded-2xl bg-water hover:bg-water-deep text-primary-foreground text-base font-semibold shadow-soft"
               >
                 {provider.native ? "Skip for now" : "Enter details manually"}
               </Button>
@@ -153,7 +153,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
         {step === 2 && (
           <div className="w-full animate-[fade-in_0.4s_ease-out]">
-            <h2 className="text-3xl font-light tracking-tight text-foreground text-balance">
+            <h2 className="text-3xl font-light tracking-normal text-foreground text-balance">
               A little about you
             </h2>
             <p className="mt-3 text-base text-muted-foreground">
@@ -208,7 +208,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                 computeGoal();
                 next();
               }}
-              className="mt-10 w-full h-14 rounded-2xl bg-water hover:bg-water-deep text-white text-base font-semibold shadow-soft"
+              className="mt-10 w-full h-14 rounded-2xl bg-water hover:bg-water-deep text-primary-foreground text-base font-semibold shadow-soft"
             >
               Continue
             </Button>
@@ -218,7 +218,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         {step === 3 && (
           <div className="w-full animate-[fade-in_0.4s_ease-out] text-center">
             <Droplet size={40} pulse className="mx-auto mb-6" />
-            <h2 className="text-3xl font-light tracking-tight text-foreground text-balance">
+            <h2 className="text-3xl font-light tracking-normal text-foreground text-balance">
               Your daily target
             </h2>
             <p className="mt-3 text-base text-muted-foreground text-balance">
@@ -227,7 +227,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
             {!editingGoal ? (
               <button onClick={() => setEditingGoal(true)} className="mt-8 inline-flex items-baseline gap-2 rounded-2xl px-6 py-4 hover:bg-muted/50 transition-colors">
-                <span className="text-7xl font-light text-foreground tabular tracking-tighter">
+                <span className="text-7xl font-light text-foreground tabular tracking-normaler">
                   {(goalMl / 1000).toFixed(1)}
                 </span>
                 <span className="text-2xl font-medium text-muted-foreground">L</span>
@@ -249,7 +249,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             </button>
 
             <div className="mt-10 flex flex-col gap-3">
-              <Button onClick={next} className="h-14 rounded-2xl bg-water hover:bg-water-deep text-white text-base font-semibold shadow-soft">
+              <Button onClick={next} className="h-14 rounded-2xl bg-water hover:bg-water-deep text-primary-foreground text-base font-semibold shadow-soft">
                 Looks good
               </Button>
               <button onClick={back} className="text-sm text-muted-foreground hover:text-foreground">Back</button>
@@ -259,7 +259,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
         {step === 4 && (
           <div className="w-full animate-[fade-in_0.4s_ease-out]">
-            <h2 className="text-3xl font-light tracking-tight text-foreground text-balance">
+            <h2 className="text-3xl font-light tracking-normal text-foreground text-balance">
               Reminders
             </h2>
             <p className="mt-3 text-base text-muted-foreground">
@@ -295,7 +295,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                           e.stopPropagation();
                           setReminderHours(h);
                         }}
-                        className={`flex-1 py-2 rounded-lg text-sm font-semibold ${reminderHours === h ? "bg-water text-white" : "bg-surface text-muted-foreground"}`}
+                        className={`flex-1 py-2 rounded-lg text-sm font-semibold ${reminderHours === h ? "bg-water text-primary-foreground" : "bg-surface text-muted-foreground"}`}
                       >
                         {h}h
                       </button>
@@ -328,7 +328,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
             <Button
               onClick={() => finish(true)}
-              className="mt-8 w-full h-14 rounded-2xl bg-water hover:bg-water-deep text-white text-base font-semibold shadow-soft"
+              className="mt-8 w-full h-14 rounded-2xl bg-water hover:bg-water-deep text-primary-foreground text-base font-semibold shadow-soft"
             >
               Start sipping
             </Button>

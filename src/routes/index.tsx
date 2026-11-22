@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { ArrowDown, ArrowRight, Check, Clock3, Droplets, GlassWater, History, Moon, Plus, Radio, Settings2, Sun, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Onboarding } from "@/components/sipsync/Onboarding";
@@ -9,293 +11,109 @@ import { HistorySheet } from "@/components/sipsync/HistorySheet";
 import { NfcSheet } from "@/components/sipsync/NfcSheet";
 import { SettingsSheet } from "@/components/sipsync/SettingsSheet";
 import { HydrationChart } from "@/components/sipsync/HydrationChart";
-import { Droplet } from "@/components/sipsync/Droplet";
-import {
-  computeStreakInfo,
-  forgivenessMessage,
-  formatAmount,
-  startOfDay,
-  toneMessage,
-  totalForDay,
-  useSipSync,
-} from "@/lib/sipsync-store";
+import { computeStreakInfo, forgivenessMessage, formatAmount, startOfDay, toneMessage, totalForDay, useSipSync } from "@/lib/sipsync-store";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "SipSync — Quiet hydration tracking" },
-      {
-        name: "description",
-        content:
-          "SipSync is a minimalist hydration app: tap an NFC sticker or the progress ring to log water instantly. Streaks, smart reminders, and a calm, native feel.",
-      },
-      { property: "og:title", content: "SipSync — Quiet hydration tracking" },
-      {
-        property: "og:description",
-        content:
-          "SipSync is a minimalist hydration app: tap an NFC sticker or the progress ring to log water instantly. Streaks, smart reminders, and a calm, native feel.",
-      },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "SipSync — Your daily hydration" },
+    { name: "description", content: "Your water, your rhythm. Track daily hydration, personal goals, and your drinking history with SipSync." },
+    { property: "og:title", content: "SipSync — Your daily hydration" },
+    { property: "og:description", content: "Your water, your rhythm. A personal space for daily hydration, goals, and drinking history." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }),
   component: Home,
 });
-
 type Range = "day" | "week" | "month";
-
 function Home() {
-  const {
-    state,
-    addLog,
-    removeLog,
-    completeOnboarding,
-    updateOnboarding,
-    setPresets,
-    setStickers,
-    clearLogs,
-    resetAll,
-  } = useSipSync();
+  const { state, addLog, removeLog, completeOnboarding, updateOnboarding, setPresets, setStickers, clearLogs, resetAll } = useSipSync();
   const [hydrated, setHydrated] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [nfcOpen, setNfcOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [flash, setFlash] = useState(0);
-  const [range, setRange] = useState<Range>("day");
-
-
-  useEffect(() => setHydrated(true), []);
-
+  const [range, setRange] = useState<Range>("week");
+  const [dark, setDark] = useState(false);
+  useEffect(() => { setHydrated(true); setDark(document.documentElement.classList.contains("dark")); }, []);
   const today = startOfDay(Date.now());
   const todayMl = useMemo(() => totalForDay(state.logs, today), [state.logs, today]);
-  const streakInfo = useMemo(
-    () => computeStreakInfo(state.logs, state.onboarding.goalMl),
-    [state.logs, state.onboarding.goalMl],
-  );
-  const streak = streakInfo.streak;
-  const forgiveNote = forgivenessMessage(streakInfo.forgiveness);
-  const percent = Math.min(100, Math.round((todayMl / state.onboarding.goalMl) * 100));
-
+  const streakInfo = useMemo(() => computeStreakInfo(state.logs, state.onboarding.goalMl), [state.logs, state.onboarding.goalMl]);
+  const todayLogs = state.logs.filter((log) => log.ts >= today);
+  const percent = Math.min(100, Math.round(todayMl / state.onboarding.goalMl * 100));
+  const remaining = Math.max(0, state.onboarding.goalMl - todayMl);
+  const rangeTotal = Array.from({ length: range === "day" ? 1 : range === "week" ? 7 : 30 }, (_, i) => totalForDay(state.logs, today - i * 86400000)).reduce((a, b) => a + b, 0);
   const handleAdd = (ml: number, source = "Manual") => {
     const entry = addLog(ml, source);
     setFlash((f) => f + 1);
-    // Haptic feedback (if supported)
-    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-      try {
-        navigator.vibrate?.(30);
-      } catch {
-        /* noop */
-      }
-    }
-    const newTotal = todayMl + ml;
-    toast(`+${formatAmount(ml, state.onboarding.unit)} added`, {
-      description: `Total today: ${formatAmount(newTotal, state.onboarding.unit)}`,
-      action: {
-        label: "Undo",
-        onClick: () => removeLog(entry.id),
-      },
-    });
+    navigator.vibrate?.(30);
+    toast(`${formatAmount(ml, state.onboarding.unit)} added`, { description: `Today: ${formatAmount(todayMl + ml, state.onboarding.unit)}`, action: { label: "Undo", onClick: () => removeLog(entry.id) } });
   };
-
-  if (!hydrated) {
-    // SSR shell — keep visually quiet to avoid flash
-    return <div className="min-h-dvh bg-background" />;
-  }
-
-  if (!state.onboarding.completed) {
-    return (
-      <>
-        <Onboarding onComplete={completeOnboarding} />
-        <Toaster position="top-center" />
-      </>
-    );
-  }
-
-  const tone = toneMessage(percent, streak);
-
+  const toggleTheme = () => { const next = !dark; setDark(next); document.documentElement.classList.toggle("dark", next); };
+  if (!hydrated) return <div className="min-h-dvh bg-background" />;
+  if (!state.onboarding.completed) return <><Onboarding onComplete={completeOnboarding} /><Toaster position="top-center" /></>;
   return (
-    <div className="min-h-dvh bg-background flex flex-col items-center relative overflow-hidden">
-      {/* Edge flash overlay */}
-      <div
-        key={flash}
-        className={`pointer-events-none fixed inset-0 z-50 ${flash ? "animate-[edge-flash_1.2s_ease-out]" : ""}`}
-        aria-hidden
-      />
-
-      {/* Ambient atmosphere */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[640px] h-[640px] rounded-full"
-        style={{
-          background:
-            "radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--color-water) 14%, transparent), transparent 70%)",
-          filter: "blur(60px)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-[-20%] left-[-10%] w-[420px] h-[420px] rounded-full opacity-60"
-        style={{
-          background:
-            "radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--color-water-deep) 8%, transparent), transparent 70%)",
-          filter: "blur(80px)",
-        }}
-      />
-
-      <main className="w-full max-w-md flex-1 flex flex-col px-6 pt-6 pb-8 relative z-10">
-        {/* Top bar */}
-        <header className="flex items-center justify-between mb-2">
-          <button
-            onClick={() => setHistoryOpen(true)}
-            className="size-9 rounded-full bg-surface/70 backdrop-blur hairline flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="History"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="9" />
-              <polyline points="12 7 12 12 15.5 13.5" />
-            </svg>
-          </button>
-
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="text-[10px] font-medium tracking-[0.42em] uppercase text-muted-foreground">
-              SipSync
-            </span>
-            <span className="font-display text-[13px] italic text-foreground/70 leading-none">
-              No.{String(streak).padStart(2, "0")}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setNfcOpen(true)}
-              className="size-9 rounded-full bg-surface/70 backdrop-blur hairline flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors relative"
-              aria-label="Simulate NFC tap"
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12a7 7 0 0 1 14 0" />
-                <path d="M8 12a4 4 0 0 1 8 0" />
-                <circle cx="12" cy="12" r="1" />
-              </svg>
-              <span className="absolute top-1.5 right-1.5 size-1 rounded-full bg-water animate-pulse" />
-            </button>
-            <button
-              onClick={() => setSettingsOpen(true)}
-              className="size-9 rounded-full bg-surface/70 backdrop-blur hairline flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Open settings"
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="2.5" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </button>
+    <div className="app-canvas min-h-dvh">
+      <div className="dashboard-shell">
+        <header className="app-header">
+          <span className="wordmark">sipsync<span className="text-primary">.</span></span>
+          <span className="header-divider" />
+          <nav aria-label="Main navigation" className="desktop-nav">
+            <Button variant="ghost" className="nav-active" onClick={() => { setHistoryOpen(false); setNfcOpen(false); setSettingsOpen(false); }}>Today</Button>
+            <Button variant="ghost" onClick={() => setHistoryOpen(true)}>History</Button>
+            <Button variant="ghost" onClick={() => setNfcOpen(true)}>Bottles</Button>
+            <Button variant="ghost" onClick={() => setSettingsOpen(true)}>Settings</Button>
+          </nav>
+          <div className="ml-auto flex gap-2">
+            <Button variant="ghost" size="icon" title={dark ? "Light appearance" : "Dark appearance"} aria-label={dark ? "Light appearance" : "Dark appearance"} onClick={toggleTheme}>{dark ? <Sun /> : <Moon />}</Button>
+            <Button variant="outline" size="icon" title="Settings" aria-label="Open settings" onClick={() => setSettingsOpen(true)}><Settings2 /></Button>
           </div>
         </header>
-
-        {/* Progress ring */}
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <ProgressRing
-            currentMl={todayMl}
-            goalMl={state.onboarding.goalMl}
-            unit={state.onboarding.unit}
-            onTap={() => setQuickOpen(true)}
-            pulseKey={flash}
-          />
-          <p className="mt-8 font-display italic text-[17px] text-foreground/75 text-center text-balance max-w-[18rem] leading-snug">
-            {tone}
-          </p>
-        </div>
-
-        {/* Streak */}
-        <div className="flex flex-col items-center gap-2 mb-6 mt-4">
-          <div className="flex items-center gap-3 px-4 py-2 bg-surface/80 backdrop-blur rounded-full hairline">
-            <span className="relative flex size-1.5">
-              <span className="absolute inset-0 rounded-full bg-water animate-ping opacity-50" />
-              <span className="relative inline-flex rounded-full size-1.5 bg-water" />
-            </span>
-            <span className="text-[10px] font-semibold tracking-[0.22em] uppercase text-foreground/80 tabular">
-              {streak === 0 ? "Begin your rhythm" : `${streak} day rhythm`}
-            </span>
-          </div>
-          {forgiveNote && (
-            <p className="text-[11px] italic text-muted-foreground font-display">{forgiveNote}</p>
-          )}
-        </div>
-
-        {/* Stats card */}
-        <div className="rounded-[28px] bg-surface hairline p-5 shadow-soft">
-          <div className="flex items-end justify-between mb-5">
-            <div>
-              <div className="text-[10px] font-medium tracking-[0.28em] uppercase text-muted-foreground">
-                {range === "day" ? "Today" : range === "week" ? "This week" : "This month"}
+        <main>
+          <section className="daily-overview">
+            <div className="overview-copy animate-enter">
+              <div className="eyebrow"><span />{new Date().toLocaleDateString("en", { weekday: "long", month: "short", day: "numeric" })}</div>
+              <h1>Your water.<br />Your rhythm<span className="text-primary">.</span></h1>
+              <p className="daily-tone">{toneMessage(percent, streakInfo.streak)}</p>
+              <div className="overview-actions">
+                <Button className="primary-pill" onClick={() => setQuickOpen(true)}>Add water <Plus /></Button>
+                <Button variant="outline" className="secondary-pill" onClick={() => setNfcOpen(true)}><Radio /> Bottle tap</Button>
               </div>
-              <div className="font-display text-3xl font-light text-foreground tabular mt-1.5 tracking-tight">
-                {formatAmount(
-                  range === "day"
-                    ? todayMl
-                    : (() => {
-                        const days = range === "week" ? 7 : 30;
-                        const day = 24 * 60 * 60 * 1000;
-                        let sum = 0;
-                        for (let i = 0; i < days; i++) {
-                          sum += totalForDay(state.logs, today - i * day);
-                        }
-                        return sum;
-                      })(),
-                  state.onboarding.unit,
-                )}
+              <div className="overview-facts">
+                <div><span className="eyebrow">Remaining</span><strong>{remaining ? formatAmount(remaining, state.onboarding.unit) : "Goal reached"}</strong></div>
+                <div><span className="eyebrow">Daily rhythm</span><strong>{streakInfo.streak} <span>days</span></strong></div>
               </div>
+              {forgivenessMessage(streakInfo.forgiveness) && <p className="text-sm text-muted-foreground mt-3">{forgivenessMessage(streakInfo.forgiveness)}</p>}
             </div>
-            <div className="bg-water-soft/60 p-0.5 rounded-full flex hairline">
-              {(["day", "week", "month"] as Range[]).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRange(r)}
-                  className={`px-3 py-1 text-[10px] font-semibold tracking-[0.18em] uppercase rounded-full transition-all ${range === r ? "bg-surface text-foreground shadow-soft" : "text-muted-foreground"}`}
-                >
-                  {r}
-                </button>
-              ))}
+            <div className="ring-area animate-enter">
+              <ProgressRing currentMl={todayMl} goalMl={state.onboarding.goalMl} unit={state.onboarding.unit} onTap={() => setQuickOpen(true)} pulseKey={flash} size={320} />
+              <div className="ring-caption"><span className="status-dot" /> {percent}% of your daily goal {percent === 100 && <Check size={14} />}</div>
             </div>
+          </section>
+          <section className="quick-section animate-enter">
+            <div className="section-heading"><h2>A little more water.</h2><Button variant="ghost" className="text-muted-foreground" onClick={() => setQuickOpen(true)}>Custom amount <ArrowRight /></Button></div>
+            <div className="quick-grid">
+              {state.presets.map((ml, i) => <Button variant="outline" key={`${ml}-${i}`} className="quick-item" onClick={() => handleAdd(ml)}><span className="quick-icon"><GlassWater /></span><span className="quick-label"><strong>{formatAmount(ml, state.onboarding.unit)}</strong><span>{i === 0 ? "A small sip" : i === 1 ? "A fresh refill" : "A little extra"}</span></span><Plus className="ml-auto text-muted-foreground" /></Button>)}
+            </div>
+          </section>
+          <div className="insights-grid animate-enter">
+            <section className="trend-section">
+              <div className="section-heading"><div><div className="eyebrow">Your hydration</div><h2 className="mt-2">The bigger picture<span className="text-primary">.</span></h2></div><div className="range-toggle" role="group" aria-label="Chart range">{(["day", "week", "month"] as Range[]).map((r) => <Button key={r} variant="ghost" size="sm" aria-pressed={range === r} className={range === r ? "range-active" : ""} onClick={() => setRange(r)}>{r}</Button>)}</div></div>
+              <div className="chart-total">{formatAmount(rangeTotal, state.onboarding.unit)} <span>{range === "day" ? "today" : `over the last ${range === "week" ? "7" : "30"} days`}</span></div>
+              <HydrationChart logs={state.logs} goalMl={state.onboarding.goalMl} range={range} />
+            </section>
+            <section className="recent-section">
+              <div className="section-heading"><h2>Today's sips</h2><Button variant="ghost" size="icon" title="View all history" aria-label="History" onClick={() => setHistoryOpen(true)}><ArrowRight /></Button></div>
+              {todayLogs.length ? <div className="recent-list">{todayLogs.slice(0, 3).map((log) => <div className="recent-row" key={log.id}><span className="recent-icon"><Droplets size={17} /></span><div><strong>{formatAmount(log.amountMl, state.onboarding.unit)}</strong><span>{log.source} · {new Date(log.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span></div><Button variant="ghost" size="icon" title="Remove entry" aria-label={`Remove ${formatAmount(log.amountMl, state.onboarding.unit)} entry`} onClick={() => removeLog(log.id)}><Trash2 className="text-muted-foreground" /></Button></div>)}</div> : <div className="empty-sips"><GlassWater size={25} /><p>A fresh start.</p><span>Your first sip is still ahead.</span></div>}
+            </section>
           </div>
-          <HydrationChart logs={state.logs} goalMl={state.onboarding.goalMl} range={range} />
-        </div>
-      </main>
-
-      <QuickAddSheet
-        open={quickOpen}
-        onOpenChange={setQuickOpen}
-        presets={state.presets}
-        unit={state.onboarding.unit}
-        onAdd={(ml) => handleAdd(ml, "Manual")}
-      />
-
-      <HistorySheet
-        open={historyOpen}
-        onOpenChange={setHistoryOpen}
-        logs={state.logs}
-        unit={state.onboarding.unit}
-        onUndo={removeLog}
-      />
-
-      <NfcSheet
-        open={nfcOpen}
-        onOpenChange={setNfcOpen}
-        stickers={state.stickers}
-        onTap={(s) => handleAdd(s.amountMl, s.name)}
-      />
-
-      <SettingsSheet
-        open={settingsOpen}
-        onOpenChange={setSettingsOpen}
-        onboarding={state.onboarding}
-        presets={state.presets}
-        stickers={state.stickers}
-        onUpdateOnboarding={updateOnboarding}
-        onSetPresets={setPresets}
-        onSetStickers={setStickers}
-        onClearLogs={clearLogs}
-        onResetAll={resetAll}
-      />
-
+        </main>
+        <footer className="app-footer"><span className="flex items-center gap-2"><span className="status-dot" /> A little, often.</span><span className="footer-line" /><span>SIPSYNC / DAILY RITUAL</span><ArrowDown size={14} /></footer>
+      </div>
+      <nav className="mobile-nav" aria-label="Mobile navigation"><Button variant="ghost" onClick={() => setQuickOpen(true)}><Plus />Add</Button><Button variant="ghost" onClick={() => setHistoryOpen(true)}><History />History</Button><Button variant="ghost" onClick={() => setNfcOpen(true)}><Radio />Bottles</Button><Button variant="ghost" onClick={() => setSettingsOpen(true)}><Settings2 />Settings</Button></nav>
+      <QuickAddSheet open={quickOpen} onOpenChange={setQuickOpen} presets={state.presets} unit={state.onboarding.unit} onAdd={(ml) => handleAdd(ml)} />
+      <HistorySheet open={historyOpen} onOpenChange={setHistoryOpen} logs={state.logs} unit={state.onboarding.unit} onUndo={removeLog} />
+      <NfcSheet open={nfcOpen} onOpenChange={setNfcOpen} stickers={state.stickers} onTap={(s) => handleAdd(s.amountMl, s.name)} />
+      <SettingsSheet open={settingsOpen} onOpenChange={setSettingsOpen} onboarding={state.onboarding} presets={state.presets} stickers={state.stickers} onUpdateOnboarding={updateOnboarding} onSetPresets={setPresets} onSetStickers={setStickers} onClearLogs={clearLogs} onResetAll={resetAll} />
       <Toaster position="top-center" />
     </div>
   );

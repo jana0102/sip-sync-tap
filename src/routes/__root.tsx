@@ -39,15 +39,13 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#5C9CE6" },
       { name: "twitter:title", content: "SipSync — Quiet hydration tracking" },
       { name: "twitter:description", content: "SipSync is a minimalist hydration app: tap an NFC sticker or the progress ring to log water instantly. Streaks, smart reminders, and a calm, native feel." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/db0814c1-9f67-4a75-b27b-951e31882ccf/id-preview-93e20ad8--481771f5-fa88-4867-a226-2851b91714d3.lovable.app-1785498575371.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/db0814c1-9f67-4a75-b27b-951e31882ccf/id-preview-93e20ad8--481771f5-fa88-4867-a226-2851b91714d3.lovable.app-1785498575371.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap",
       },
       {
         rel: "stylesheet",

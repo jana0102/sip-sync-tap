@@ -300,3 +300,19 @@ h1 { font-size: 62px; font-weight: 500; line-height: 1.08; margin-top: 23px; let
  .mobile-nav { display: flex; justify-content: space-around; position: fixed; bottom: 0; inset-inline: 0; z-index: 30; background: color-mix(in oklab, var(--surface) 90%, transparent); backdrop-filter: blur(18px); border-top: 1px solid var(--hairline); padding: 9px 10px max(9px, env(safe-area-inset-bottom)); }.mobile-nav button { flex-direction: column; height: 44px; gap: 5px; font-size: 9px; color: var(--muted-foreground); }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* App shell: phone-app layout on every screen size */
+.app-canvas { display: flex; justify-content: center; }
+.dashboard-shell { width: 100%; max-width: 440px; padding: 0 22px calc(90px + env(safe-area-inset-bottom)); padding-top: env(safe-area-inset-top); }
+.app-header { height: 72px; gap: 16px; position: sticky; top: 0; z-index: 20; background: color-mix(in oklab, var(--background) 85%, transparent); backdrop-filter: blur(18px); }
+.wordmark { font-size: 26px; }
+.header-divider, .desktop-nav, .app-footer { display: none !important; }
+.daily-overview { grid-template-columns: 1fr; padding: 24px 0 28px; gap: 28px; }
+.ring-area { order: -1; }
+.daily-overview h1 { font-size: 40px; margin-top: 12px; }
+.hydration-ring { width: 270px !important; height: 270px !important; }
+.insights-grid { grid-template-columns: 1fr; gap: 26px; }
+.recent-section { padding-left: 0; border-left: 0; border-top: 1px solid var(--hairline); padding-top: 22px; }
+.quick-grid { grid-template-columns: 1fr !important; }
+.mobile-nav { display: flex; justify-content: space-around; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 440px; z-index: 30; background: color-mix(in oklab, var(--surface) 90%, transparent); backdrop-filter: blur(18px); border-top: 1px solid var(--hairline); padding: 9px 10px max(9px, env(safe-area-inset-bottom)); }
+.mobile-nav button { flex-direction: column; height: 44px; gap: 5px; font-size: 10px; color: var(--muted-foreground); }
